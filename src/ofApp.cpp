@@ -6,27 +6,47 @@ void ofApp::setup(){
     ofSetFrameRate(60);
     ofEnableDepthTest(); // Enable depth testing for 3D rendering
     ofBackground(0); // Set background to black
+    
+    // Precalculate the base line
+    for (int i = 0; i < 40; i++) {
+        float t = (float)i / 39.0f;
+        float x = t * rotationRadius;
+        float y = 100.0f - (t * 200.0f);
+        float z = t * rotationRadius;
+        baseLine.addVertex(x, y, z);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    while(receiver.hasWaitingMessages()){
-        ofxOscMessage m;
-        receiver.getNextMessage(m);
-        
-        // Format the message
-        string msg = "Address: " + m.getAddress();
-        for(int i = 0; i < m.getNumArgs(); i++){
-            msg += " | Arg " + ofToString(i) + ": " + m.getArgAsString(i);
-        }
-        
-        // Add to messages vector
-        messages.push_back(msg);
-        
-        // Keep only last MAX_MESSAGES
-        while(messages.size() > MAX_MESSAGES){
-            messages.erase(messages.begin());
-        }
+    float currentTime = ofGetElapsedTimef();
+    rotationAngle = (currentTime / totalRotationTime) * 360.0f;
+
+    baseLine.clear();
+
+        // Recalculate the base line
+    for (int i = 0; i < 40; i++) {
+        float t = (float)i / 39.0f;
+        float x = t * rotationRadius;
+        float y = (100.0f - (t * 200.0f)) + (ofNoise(rotationAngle * t) * 20.0f) - 20.0f;
+        float z = t * rotationRadius;
+        baseLine.addVertex(x, y, z);
+    }
+    
+    if (currentTime - lastSnapshotTime >= snapshotInterval) {
+        takeSnapshot();
+        lastSnapshotTime = currentTime;
+    }
+}
+
+void ofApp::takeSnapshot() {
+    ofPolyline snapshot = baseLine;
+    snapshot.getVertices();  // Force vertex calculation
+    snapshot.rotateDeg(rotationAngle, ofVec3f(0,1,0));
+    lineSnapshots.push_back(snapshot);
+    
+    if (lineSnapshots.size() > samples) {
+        lineSnapshots.erase(lineSnapshots.begin());
     }
 }
 
@@ -34,39 +54,25 @@ void ofApp::update(){
 void ofApp::draw(){
     cam.begin();
     
-    ofSetLineWidth(2);
+    // Static vertical line
+    ofSetColor(255);
+    // ofDrawLine(0, -100, 0, 0, 100, 0);
     
-    // Draw first vertical line
-    ofSetColor(255, 255, 255);
-    ofDrawLine(0, 0, 0, 
-               0, 100, 0);
-    
-    // Calculate rotation angle (complete revolution every 10 seconds)
-    float angle = ofGetElapsedTimef() * (360.0f/10.0f);
-    
-    // Draw diagonal line
-    ofSetColor(255, 255, 255);
-    ofPushMatrix();
-    ofRotateDeg(angle, 0, 1, 0); // Rotate around Y axis
-    
-    ofPolyline line;
-    for (int i = 0; i < 40; i++) {
-        // Interpolate from top of vertical line to floor point
-        float t = (float)i / 39.0f; // Normalized time from 0 to 1
-        
-        // Start point: top of vertical line (0, 100, 0)
-        // End point: floor plane, 20 units away diagonally
-        float x = t * 40.0f;  // Move from 0 to 20 on x-axis
-        float y = 100.0f - (t * 100.0f);  // Move from 100 to -100 on y-axis
-        float z = t * 40.0f;  // Move from 0 to 20 on z-axis
-        
-        //ofVertex(x, y, z);
-        line.addVertex(x, y, z);
+    // Draw snapshots
+    for (size_t i = 0; i < lineSnapshots.size(); ++i) {
+        float alpha = ofMap(i, 0, lineSnapshots.size(), 50, 200);
+        ofSetColor(255, 255, 255, alpha);
+        lineSnapshots[i].draw();
     }
-    line.draw();
-    //ofEndShape();
     
+    // Current line
+    ofPushMatrix();
+    ofRotateDeg(rotationAngle, 0, 1, 0);
+    ofSetColor(0, 255, 0);
+    ofSetLineWidth(2);
+    baseLine.draw();
     ofPopMatrix();
+    
     cam.end();
 }
 

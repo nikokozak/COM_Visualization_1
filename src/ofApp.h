@@ -31,5 +31,16 @@ class ofApp : public ofBaseApp{
 		vector<string> messages;
 		const int MAX_MESSAGES = 50; // Keep last 50 messages
 		
+		void takeSnapshot();
+
+		ofPolyline baseLine;
+		vector<ofPolyline> lineSnapshots;
+		int samples = 40;
+		float rotationAngle = 0.0f; // Starting angle
+		float totalRotationTime = 10.0f; // Total time for one full rotation
+		float lastSnapshotTime = 0.0f; // Time of last snapshot
+		float snapshotInterval = 0.15f; // Interval between snapshots
+		float rotationRadius = 300.0f; // Radius size of the rotation
+		
 		ofEasyCam cam;
 };
