@@ -2,9 +2,10 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    receiver.setup(PORT);
-    ofSetBackgroundColor(0);
+    // Set up the 3D environment
     ofSetFrameRate(60);
+    ofEnableDepthTest(); // Enable depth testing for 3D rendering
+    ofBackground(0); // Set background to black
 }
 
 //--------------------------------------------------------------
@@ -31,15 +32,42 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofSetColor(255);
+    cam.begin();
     
-    // Draw messages from bottom to top
-    float y = ofGetHeight() - 20;
-    for(int i = messages.size() - 1; i >= 0; i--){
-        ofDrawBitmapString(messages[i], 20, y);
-        y -= 20;
-        if(y < 0) break;
+    ofSetLineWidth(2);
+    
+    // Draw first vertical line
+    ofSetColor(255, 255, 255);
+    ofDrawLine(0, 0, 0, 
+               0, 100, 0);
+    
+    // Calculate rotation angle (complete revolution every 10 seconds)
+    float angle = ofGetElapsedTimef() * (360.0f/10.0f);
+    
+    // Draw diagonal line
+    ofSetColor(255, 255, 255);
+    ofPushMatrix();
+    ofRotateDeg(angle, 0, 1, 0); // Rotate around Y axis
+    
+    ofPolyline line;
+    for (int i = 0; i < 40; i++) {
+        // Interpolate from top of vertical line to floor point
+        float t = (float)i / 39.0f; // Normalized time from 0 to 1
+        
+        // Start point: top of vertical line (0, 100, 0)
+        // End point: floor plane, 20 units away diagonally
+        float x = t * 40.0f;  // Move from 0 to 20 on x-axis
+        float y = 100.0f - (t * 100.0f);  // Move from 100 to -100 on y-axis
+        float z = t * 40.0f;  // Move from 0 to 20 on z-axis
+        
+        //ofVertex(x, y, z);
+        line.addVertex(x, y, z);
     }
+    line.draw();
+    //ofEndShape();
+    
+    ofPopMatrix();
+    cam.end();
 }
 
 //--------------------------------------------------------------

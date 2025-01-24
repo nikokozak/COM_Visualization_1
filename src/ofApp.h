@@ -30,4 +30,6 @@ class ofApp : public ofBaseApp{
 		ofxOscReceiver receiver;
 		vector<string> messages;
 		const int MAX_MESSAGES = 50; // Keep last 50 messages
+		
+		ofEasyCam cam;
 };
