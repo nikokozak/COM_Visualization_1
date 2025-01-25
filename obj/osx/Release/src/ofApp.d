@@ -443,7 +443,19 @@ obj/osx/Release/src/ofApp.o: \
   /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/src/ofxOscReceiver.h \
   /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/libs/oscpack/src/osc/OscPacketListener.h \
   /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.h \
-  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/libs/oscpack/src/osc/../ip/PacketListener.h
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/libs/oscpack/src/osc/../ip/PacketListener.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxGui.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxToggle.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxBaseGui.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxSlider.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxInputField.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxGuiUtils.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxSliderGroup.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxGuiGroup.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxButton.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxLabel.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxColorPicker.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxPanel.h
 /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/apps/myApps/COM_OSC/src/ofApp.h:
 ../../../libs/openFrameworks/ofMain.h:
 ../../../libs/openFrameworks/utils/ofConstants.h:
@@ -888,3 +900,15 @@ obj/osx/Release/src/ofApp.o: \
 /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/libs/oscpack/src/osc/OscPacketListener.h:
 /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.h:
 /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxOsc/libs/oscpack/src/osc/../ip/PacketListener.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxGui.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxToggle.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxBaseGui.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxSlider.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxInputField.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxGuiUtils.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxSliderGroup.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxGuiGroup.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxButton.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxLabel.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxColorPicker.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxPanel.h:

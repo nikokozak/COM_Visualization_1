@@ -4,7 +4,7 @@
 void ofApp::setup(){
     // Set up the 3D environment
     ofSetFrameRate(60);
-    ofEnableDepthTest(); // Enable depth testing for 3D rendering
+    // ofEnableDepthTest(); // Enable depth testing for 3D rendering
     ofBackground(0); // Set background to black
     
     // Precalculate the base line
@@ -29,6 +29,33 @@ void ofApp::setup(){
     material.setAmbientColor(ofColor(50, 50, 50));  // Add ambient color to material
 
     ofSetGlobalAmbientColor(ofColor(100, 100, 100));  // Adjust values (0-255) to control ambient intensity
+
+    // Setup GUI
+    gui.setup("Parameters");
+    gui.setPosition(20, 20);
+    gui.setDefaultWidth(300);
+    gui.setDefaultHeight(20);
+    gui.add(height.setup("Cone Height", 100, 10, 500));
+    gui.add(segments.setup("Line Segments", 150, 10, 300));
+    gui.add(rotationTime.setup("Rotation Time", 10, 1, 30));
+    gui.add(snapshotIntervalSlider.setup("Snapshot Interval", 0.05, 0.01, 0.5));
+    gui.add(sampleSlider.setup("Samples", 35, 10, 200));
+    
+    // Update initial values
+    rotationRadius = radius;
+    coneHeight = height;
+    lineSegments = segments;
+    totalRotationTime = rotationTime;
+    snapshotInterval = snapshotIntervalSlider;
+    samples = sampleSlider;
+    
+    ofxGuiSetFont("DIN Alternate Bold", 10);
+    ofxGuiSetDefaultWidth(300);
+    ofxGuiSetDefaultHeight(18);
+    ofxGuiSetTextPadding(4);
+    ofxGuiSetFillColor(ofColor(128, 128, 128));
+    ofxGuiSetBackgroundColor(ofColor(0, 0, 0));
+    ofxGuiSetBorderColor(ofColor(200, 200, 200));
 }
 
 //--------------------------------------------------------------
@@ -51,6 +78,13 @@ void ofApp::update(){
         takeSnapshot();
         lastSnapshotTime = currentTime;
     }
+
+    // Update values each frame
+    rotationRadius = radius;
+    coneHeight = height;
+    lineSegments = segments;
+    totalRotationTime = rotationTime;
+    snapshotInterval = snapshotIntervalSlider;
 }
 
 void ofApp::takeSnapshot() {
@@ -152,6 +186,7 @@ void ofApp::draw(){
     
     ofEnableAlphaBlending();
     ofEnableLighting();
+    ofEnableDepthTest();
     light.enable();
     
     // Draw mesh with material
@@ -187,15 +222,24 @@ void ofApp::draw(){
     ofSetLineWidth(2);
     baseLine.draw();
     ofPopMatrix();
-    
+
     light.disable();
     ofDisableAlphaBlending();
     
     cam.end();
+
+    ofDisableDepthTest();
+    
+    ofSetColor(255);  // Reset color to white before drawing GUI
+    if (showGui) {
+        gui.draw();
+    }
     
     // Draw instructions
-    ofSetColor(255);
-    ofDrawBitmapString("Press 'l' to toggle light movement mode\nWhen active, use mouse to move light\nPress 's' to save light position", 20, 20);
+    ofDrawBitmapString("Press 'l' to toggle light movement mode\n"
+                      "When active, use mouse to move light\n"
+                      "Press 's' to save light position\n"
+                      "Press 'h' to show/hide GUI", 20, ofGetHeight() - 80);
 }
 
 //--------------------------------------------------------------
@@ -211,6 +255,9 @@ void ofApp::keyPressed(int key){
     if(key == 's' || key == 'S') {
         // Print current light position to console
         ofLogNotice() << "Light position: " << lightPos.x << ", " << lightPos.y << ", " << lightPos.z;
+    }
+    if(key == 'h' || key == 'H') {
+        showGui = !showGui;  // Fixed visibility toggle
     }
 }
 
@@ -272,4 +319,17 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+// Add this new method
+void ofApp::paramChanged(float& value) {
+    totalRotationTime = totalRotationTimeParam;
+    snapshotInterval = snapshotIntervalParam;
+    rotationRadius = rotationRadiusParam;
+    coneHeight = coneHeightParam;
+    lineSegments = lineSegmentsParam;
+    
+    // Clear existing mesh and snapshots when parameters change
+    mesh.clear();
+    lineSnapshots.clear();
 }
