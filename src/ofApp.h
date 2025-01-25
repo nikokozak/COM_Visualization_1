@@ -38,11 +38,19 @@ class ofApp : public ofBaseApp{
 		float rotationAngle = 0.0f; // Starting angle
 		float totalRotationTime = 10.0f; // Total time for one full rotation
 		float lastSnapshotTime = 0.0f; // Time of last snapshot
-		float snapshotInterval = 0.15f; // Interval between snapshots
+		float snapshotInterval = 0.05f; // Interval between snapshots
 		float rotationRadius = 300.0f; // Radius size of the rotation
+		float coneHeight = 100.0f;
+		int lineSegments = 150;
 		
 		ofEasyCam cam;
 
 		ofMesh mesh;
-		int samples = 25;  // Match this with your snapshot limit
+		int samples = 35;  // Match this with your snapshot limit
+
+		ofLight light;
+		ofMaterial material;
+
+		ofVec3f lightPos = ofVec3f(300, 300, 500);
+		bool movingLight = false;
 };
