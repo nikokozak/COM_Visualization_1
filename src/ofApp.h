@@ -35,7 +35,6 @@ class ofApp : public ofBaseApp{
 
 		ofPolyline baseLine;
 		vector<ofPolyline> lineSnapshots;
-		int samples = 40;
 		float rotationAngle = 0.0f; // Starting angle
 		float totalRotationTime = 10.0f; // Total time for one full rotation
 		float lastSnapshotTime = 0.0f; // Time of last snapshot
@@ -43,4 +42,7 @@ class ofApp : public ofBaseApp{
 		float rotationRadius = 300.0f; // Radius size of the rotation
 		
 		ofEasyCam cam;
+
+		ofMesh mesh;
+		int samples = 25;  // Match this with your snapshot limit
 };

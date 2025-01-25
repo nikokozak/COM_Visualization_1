@@ -41,12 +41,68 @@ void ofApp::update(){
 
 void ofApp::takeSnapshot() {
     ofPolyline snapshot = baseLine;
-    snapshot.getVertices();  // Force vertex calculation
+    snapshot.getVertices();
     snapshot.rotateDeg(rotationAngle, ofVec3f(0,1,0));
     lineSnapshots.push_back(snapshot);
     
+    // Create mesh faces between last two snapshots
+    if (lineSnapshots.size() >= 2) {
+        auto& current = lineSnapshots.back();
+        auto& previous = lineSnapshots[lineSnapshots.size() - 2];
+        
+        // Get vertices from both lines
+        auto& currentVerts = current.getVertices();
+        auto& prevVerts = previous.getVertices();
+        
+        // Create triangles between the lines
+        for (int i = 0; i < currentVerts.size() - 1; i++) {
+            // First triangle
+            mesh.addVertex(prevVerts[i]);
+            mesh.addVertex(currentVerts[i]);
+            mesh.addVertex(currentVerts[i + 1]);
+            
+            // Second triangle
+            mesh.addVertex(prevVerts[i]);
+            mesh.addVertex(currentVerts[i + 1]);
+            mesh.addVertex(prevVerts[i + 1]);
+            
+            // Add colors with alpha for semi-transparency
+            ofColor color(0, 128, 255, 150);
+            mesh.addColor(color);
+            mesh.addColor(color);
+            mesh.addColor(color);
+            mesh.addColor(color);
+            mesh.addColor(color);
+            mesh.addColor(color);
+        }
+    }
+    
     if (lineSnapshots.size() > samples) {
         lineSnapshots.erase(lineSnapshots.begin());
+        // Optional: remove old vertices/faces from mesh
+        mesh.clear();
+        // Rebuild mesh from remaining snapshots
+        for (size_t i = 0; i < lineSnapshots.size() - 1; i++) {
+            auto& current = lineSnapshots[i + 1];
+            auto& previous = lineSnapshots[i];
+            auto& currentVerts = current.getVertices();
+            auto& prevVerts = previous.getVertices();
+            
+            for (int j = 0; j < currentVerts.size() - 1; j++) {
+                mesh.addVertex(prevVerts[j]);
+                mesh.addVertex(currentVerts[j]);
+                mesh.addVertex(currentVerts[j + 1]);
+                
+                mesh.addVertex(prevVerts[j]);
+                mesh.addVertex(currentVerts[j + 1]);
+                mesh.addVertex(prevVerts[j + 1]);
+                
+                ofColor color(0, 128, 255, 150);
+                for (int k = 0; k < 6; k++) {
+                    mesh.addColor(color);
+                }
+            }
+        }
     }
 }
 
@@ -54,11 +110,13 @@ void ofApp::takeSnapshot() {
 void ofApp::draw(){
     cam.begin();
     
-    // Static vertical line
-    ofSetColor(255);
-    // ofDrawLine(0, -100, 0, 0, 100, 0);
+    ofEnableAlphaBlending();
     
-    // Draw snapshots
+    // Draw mesh
+    ofSetColor(255);
+    mesh.drawFaces();
+    
+    // Draw snapshots (optional now - you might want to remove these)
     for (size_t i = 0; i < lineSnapshots.size(); ++i) {
         float alpha = ofMap(i, 0, lineSnapshots.size(), 50, 200);
         ofSetColor(255, 255, 255, alpha);
@@ -72,6 +130,8 @@ void ofApp::draw(){
     ofSetLineWidth(2);
     baseLine.draw();
     ofPopMatrix();
+    
+    ofDisableAlphaBlending();
     
     cam.end();
 }
