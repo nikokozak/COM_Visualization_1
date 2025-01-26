@@ -40,9 +40,10 @@ void ofApp::setup(){
     gui.add(rotationTime.setup("Rotation Time", 10, 1, 30));
     gui.add(snapshotIntervalSlider.setup("Snapshot Interval", 0.05, 0.01, 0.5));
     gui.add(sampleSlider.setup("Samples", 35, 10, 200));
+    gui.add(rotationRadiusSlider.setup("Rotation Radius", 250, 50, 1000));
     
     // Update initial values
-    rotationRadius = radius;
+    rotationRadius = rotationRadiusSlider;
     coneHeight = height;
     lineSegments = segments;
     totalRotationTime = rotationTime;
@@ -68,8 +69,10 @@ void ofApp::update(){
         // Recalculate the base line
     for (int i = 0; i < lineSegments; i++) {
         float t = (float)i / (lineSegments - 1.0f);
+        float timeScale = 0.05;
+        float noiseVal = ofSignedNoise(rotationAngle * t * timeScale);
         float x = t * rotationRadius;
-        float y = (coneHeight - (t * (coneHeight * 2))) + (ofNoise(rotationAngle * t) * 20.0f) - 20.0f;
+        float y = (coneHeight - (t * (coneHeight * 2))) + (noiseVal * 10.0f);
         float z = t * rotationRadius;
         baseLine.addVertex(x, y, z);
     }
@@ -80,7 +83,7 @@ void ofApp::update(){
     }
 
     // Update values each frame
-    rotationRadius = radius;
+    rotationRadius = rotationRadiusSlider;
     coneHeight = height;
     lineSegments = segments;
     totalRotationTime = rotationTime;
