@@ -64,6 +64,9 @@ class ofApp : public ofBaseApp{
 		ofxFloatSlider rotationTime;
 		ofxFloatSlider snapshotIntervalSlider;
 		ofxFloatSlider rotationRadiusSlider;
+		ofxIntSlider lightPosX;
+		ofxIntSlider lightPosY;
+		ofxIntSlider lightPosZ;
 
 		// GUI parameters
 		ofParameter<float> totalRotationTimeParam{"Rotation Time", 10.0f, 1.0f, 30.0f};

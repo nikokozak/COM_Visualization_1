@@ -20,7 +20,8 @@ void ofApp::setup(){
     light.setPosition(lightPos.x, lightPos.y, lightPos.z);
     light.setDiffuseColor(ofColor(255, 255, 255));
     light.setSpecularColor(ofColor(255, 255, 255));
-    light.setAmbientColor(ofColor(50, 50, 50));  // Add ambient color to light
+    //light.setAmbientColor(ofColor(50, 50, 50));  // Add ambient color to light
+    light.setPointLight();
     
     // Setup material
     material.setDiffuseColor(ofColor(255, 255, 255, 150));
@@ -41,6 +42,9 @@ void ofApp::setup(){
     gui.add(snapshotIntervalSlider.setup("Snapshot Interval", 0.05, 0.01, 0.5));
     gui.add(sampleSlider.setup("Samples", 35, 10, 200));
     gui.add(rotationRadiusSlider.setup("Rotation Radius", 250, 50, 1000));
+    gui.add(lightPosX.setup("Light Pos X", 300, -1000, 1000));
+    gui.add(lightPosY.setup("Light Pos Y", 300, -1000, 1000));
+    gui.add(lightPosZ.setup("Light Pos Z", 300, -1000, 1000));
     
     // Update initial values
     rotationRadius = rotationRadiusSlider;
@@ -65,6 +69,11 @@ void ofApp::update(){
     rotationAngle = (currentTime / totalRotationTime) * 360.0f;
 
     baseLine.clear();
+
+    light.setPosition(lightPosX, lightPosY, lightPosZ);
+    lightPos.x = lightPosX;
+    lightPos.y = lightPosY;
+    lightPos.z = lightPosZ;
 
         // Recalculate the base line
     for (int i = 0; i < lineSegments; i++) {
@@ -185,12 +194,13 @@ void ofApp::takeSnapshot() {
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    ofEnableLighting();
+    light.enable();
+
     cam.begin();
     
     ofEnableAlphaBlending();
-    ofEnableLighting();
     ofEnableDepthTest();
-    light.enable();
     
     // Draw mesh with material
     material.begin();
@@ -226,10 +236,10 @@ void ofApp::draw(){
     baseLine.draw();
     ofPopMatrix();
 
-    light.disable();
     ofDisableAlphaBlending();
     
     cam.end();
+    light.disable();
 
     ofDisableDepthTest();
     
