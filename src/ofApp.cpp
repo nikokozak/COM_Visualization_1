@@ -75,6 +75,17 @@ void ofApp::update(){
     lightPos.y = lightPosY;
     lightPos.z = lightPosZ;
 
+/*     // Recalculate the base line
+    for (int i = 0; i < lineSegments; i++) {
+        float t = (float)i / (lineSegments - 1.0f);
+        float timeScale = 0.05;
+        float noiseVal = ofSignedNoise(rotationAngle * t * timeScale);
+        float x = t * rotationRadius;
+        float y = (coneHeight - (t * (coneHeight * 2))) + (noiseVal * 10.0f);
+        float z = t * rotationRadius;
+        baseLine.addVertex(x, y, z);
+    } */
+
         // Recalculate the base line
     for (int i = 0; i < lineSegments; i++) {
         float t = (float)i / (lineSegments - 1.0f);
@@ -197,28 +208,35 @@ void ofApp::draw(){
     ofEnableLighting();
     light.enable();
 
+    // Draw Helpers
+    if (showGui) {
+        ofSetColor(255);  // Reset color to white before drawing GUI
+        gui.draw();
+        ofDisableLighting();
+        ofSetColor(255, 255, 0);  // Yellow for light visualization
+        ofDrawSphere(lightPos, 10);  // Light position indicator
+        // Optional: draw axes at light position
+        ofPushMatrix();
+        ofTranslate(lightPos);
+        ofDrawAxis(50);
+        ofPopMatrix();
+        ofEnableLighting();
+    }
+        
     cam.begin();
     
     ofEnableAlphaBlending();
     ofEnableDepthTest();
+
+    // Begin pushMatrix to make everythiing stationary
+    ofPushMatrix();
+    ofRotateDeg(-rotationAngle, 0,1,0);
     
     // Draw mesh with material
     material.begin();
     mesh.drawFaces();
     material.end();
-    
-    // Visualize light position
-    if (showGui) {
-        ofDisableLighting();
-        ofSetColor(255, 255, 0);  // Yellow for light visualization
-        ofDrawSphere(lightPos, 10);  // Light position indicator
-    }
-    
-    // Optional: draw axes at light position
-    ofPushMatrix();
-    ofTranslate(lightPos);
-    ofDrawAxis(50);
-    ofPopMatrix();
+
     
     // Disable lighting for lines
     ofDisableLighting();
@@ -240,16 +258,14 @@ void ofApp::draw(){
 
     ofDisableAlphaBlending();
     
+    ofPopMatrix();
     cam.end();
     light.disable();
 
+ 
+
     ofDisableDepthTest();
-    
-    ofSetColor(255);  // Reset color to white before drawing GUI
-    if (showGui) {
-        gui.draw();
-    }
-    
+
     // Draw instructions
     ofDrawBitmapString("Press 'l' to toggle light movement mode\n"
                       "When active, use mouse to move light\n"
