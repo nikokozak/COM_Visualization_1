@@ -276,19 +276,32 @@ void ofApp::draw(){
         mesh.drawFaces();
         material.end();
     } else {
-        // Draw points from snapshots
-        ofSetColor(255);
-        ofSetLineWidth(1);
+        // Draw points and their trails
+        ofEnableAlphaBlending();
         glPointSize(pointSize);
         
-        for(const auto& snapshot : lineSnapshots) {
-            auto& verts = snapshot.getVertices();
+        // For each vertex position in the current snapshot
+        int numVerts = lineSnapshots[0].getVertices().size();
+        for(int vertIndex = 0; vertIndex < numVerts; vertIndex++) {
+            // Draw trail through time for this vertex position
+            glBegin(GL_LINE_STRIP);
+            for(size_t snapIndex = 0; snapIndex < lineSnapshots.size(); snapIndex++) {
+                float alpha = ofMap(snapIndex, 0, lineSnapshots.size(), 50, 255);
+                ofSetColor(255, 255, 255, alpha);
+                auto& vert = lineSnapshots[snapIndex].getVertices()[vertIndex];
+                glVertex3f(vert.x, vert.y, vert.z);
+            }
+            glEnd();
+            
+            // Draw points over the trails
             glBegin(GL_POINTS);
-            for(const auto& v : verts) {
-                glVertex3f(v.x, v.y, v.z);
+            for(const auto& snapshot : lineSnapshots) {
+                auto& vert = snapshot.getVertices()[vertIndex];
+                glVertex3f(vert.x, vert.y, vert.z);
             }
             glEnd();
         }
+        ofDisableAlphaBlending();
     }
     
     // Disable lighting for lines
