@@ -208,9 +208,11 @@ void ofApp::draw(){
     material.end();
     
     // Visualize light position
-    ofDisableLighting();
-    ofSetColor(255, 255, 0);  // Yellow for light visualization
-    ofDrawSphere(lightPos, 10);  // Light position indicator
+    if (showGui) {
+        ofDisableLighting();
+        ofSetColor(255, 255, 0);  // Yellow for light visualization
+        ofDrawSphere(lightPos, 10);  // Light position indicator
+    }
     
     // Optional: draw axes at light position
     ofPushMatrix();
