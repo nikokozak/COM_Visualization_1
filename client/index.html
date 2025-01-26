@@ -10,7 +10,7 @@
     <script>
         const sound = new SimplePlayer("samples/pad.wav");
         sound.toDestination();
-        let analyzerSize = 16;
+        let analyzerSize = 64;
         let analyzer = new Tone.FFT(analyzerSize);
         sound.connect(analyzer);
 
@@ -35,7 +35,7 @@
             let frequencyDataArray = Array.from(frequencyData);
             frequencyDataArray = frequencyDataArray.map(value => value === -Infinity ? 0 : value);
 
-            console.log(frequencyDataArray);
+            //console.log(frequencyDataArray);
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ frequencyData: frequencyDataArray }));
             }

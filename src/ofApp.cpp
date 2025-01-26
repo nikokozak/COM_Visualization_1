@@ -28,7 +28,7 @@ void ofApp::setup(){
     light.setPointLight();
     
     // Setup material
-    material.setDiffuseColor(ofColor(255, 255, 255, 150));
+    material.setDiffuseColor(ofColor(255, 255, 255, 255));
     material.setSpecularColor(ofColor(255, 255, 255, 255));
     material.setShininess(10);  // Lower value for softer highlights
     material.setAmbientColor(ofColor(50, 50, 50));  // Add ambient color to material
@@ -51,6 +51,8 @@ void ofApp::setup(){
     gui.add(lightPosZ.setup("Light Pos Z", 300, -1000, 1000));
     gui.add(dbMin.setup("DB Min", -30, -0, -100));
     gui.add(dbMax.setup("DB Max", -40, -0, -100));
+    gui.add(drawMeshToggle.setup("Draw Mesh", true));
+    gui.add(pointSize.setup("Point Size", 2, 1, 10));
     
     // Update initial values
     rotationRadius = rotationRadiusSlider;
@@ -124,7 +126,7 @@ void ofApp::update(){
     for (int i = 0; i < interpolationSteps; i++) {
         float t = (float)i / (interpolationSteps - 1.0f);
         float timeScale = 0.05;
-        float noiseVal = ofMap(interpolatedPoints[i].x, dbMin, dbMax, 0, 100, true);
+        float noiseVal = ofMap(interpolatedPoints[i].x, dbMax, dbMin, -40, 40, true);
         float x = t * rotationRadius;
         float y = (coneHeight - (t * (coneHeight * 2))) + noiseVal;
         float z = t * rotationRadius;
@@ -268,11 +270,26 @@ void ofApp::draw(){
     ofPushMatrix();
     ofRotateDeg(-rotationAngle, 0,1,0);
     
-    // Draw mesh with material
-    material.begin();
-    mesh.drawFaces();
-    material.end();
-
+    if(drawMeshToggle) {
+        // Draw mesh with material
+        material.begin();
+        mesh.drawFaces();
+        material.end();
+    } else {
+        // Draw points from snapshots
+        ofSetColor(255);
+        ofSetLineWidth(1);
+        glPointSize(pointSize);
+        
+        for(const auto& snapshot : lineSnapshots) {
+            auto& verts = snapshot.getVertices();
+            glBegin(GL_POINTS);
+            for(const auto& v : verts) {
+                glVertex3f(v.x, v.y, v.z);
+            }
+            glEnd();
+        }
+    }
     
     // Disable lighting for lines
     ofDisableLighting();

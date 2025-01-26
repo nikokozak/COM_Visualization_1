@@ -88,4 +88,8 @@ class ofApp : public ofBaseApp{
 
 		int FFT_SIZE = 17;  // Adjust size as needed
 		vector<float> fftData;
+
+		// Add to your GUI parameters
+		ofxToggle drawMeshToggle;
+		ofxFloatSlider pointSize;
 };
