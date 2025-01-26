@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 #include "ofxGui.h"
+#include "ofxCurve.h"
 
 // listening port
 #define PORT 55555
@@ -30,9 +31,14 @@ class ofApp : public ofBaseApp{
 		
 		ofxOscReceiver receiver;
 		vector<string> messages;
-		const int MAX_MESSAGES = 50; // Keep last 50 messages
+		const int MAX_MESSAGES = 40; // Keep last 50 messages
 		
 		void takeSnapshot();
+
+		// Points for curves.
+		int interpolationSteps = 100;
+		vector<glm::vec3> controlPoints;
+		vector<glm::vec3> interpolatedPoints;
 
 		ofPolyline baseLine;
 		vector<ofPolyline> lineSnapshots;
@@ -67,6 +73,8 @@ class ofApp : public ofBaseApp{
 		ofxIntSlider lightPosX;
 		ofxIntSlider lightPosY;
 		ofxIntSlider lightPosZ;
+		ofxIntSlider dbMin;
+		ofxIntSlider dbMax;
 
 		// GUI parameters
 		ofParameter<float> totalRotationTimeParam{"Rotation Time", 10.0f, 1.0f, 30.0f};
@@ -77,4 +85,7 @@ class ofApp : public ofBaseApp{
 		
 		void paramChanged(float& value);  // For float parameters
 		void paramChanged(int& value);    // For int parameters
+
+		int FFT_SIZE = 17;  // Adjust size as needed
+		vector<float> fftData;
 };

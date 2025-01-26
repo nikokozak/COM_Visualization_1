@@ -455,7 +455,8 @@ obj/osx/Release/src/main.o: \
   /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxButton.h \
   /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxLabel.h \
   /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxColorPicker.h \
-  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxPanel.h
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxPanel.h \
+  /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxCurve/src/ofxCurve.h
 ../../../libs/openFrameworks/ofMain.h:
 ../../../libs/openFrameworks/utils/ofConstants.h:
 ../../../libs/glew/include/GL/glew.h:
@@ -912,3 +913,4 @@ obj/osx/Release/src/main.o: \
 /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxLabel.h:
 /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxColorPicker.h:
 /Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxGui/src/ofxPanel.h:
+/Users/niko/Documents/Projects/SCRATCH/of_v0.12.0_osx_release/addons/ofxCurve/src/ofxCurve.h:

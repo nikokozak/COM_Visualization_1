@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.9/Tone.js"></script>
+    <script src="scripts/simplePlayer.js"></script>
+</head>
+<body>
+    <script>
+        const sound = new SimplePlayer("samples/pad.wav");
+        sound.toDestination();
+        let analyzerSize = 16;
+        let analyzer = new Tone.FFT(analyzerSize);
+        sound.connect(analyzer);
+
+        let loaded = false;
+        let ws;
+
+        function setup() {  
+            createCanvas(100, 100);
+            ws = new WebSocket('ws://localhost:8080');
+            
+            ws.onopen = () => {
+                console.log('Connected to server');
+            };
+        }
+
+        function draw() {
+            background(220);
+            textSize(32);
+            text('Press any key', 100, 200);
+
+            let frequencyData = analyzer.getValue();
+            let frequencyDataArray = Array.from(frequencyData);
+            frequencyDataArray = frequencyDataArray.map(value => value === -Infinity ? 0 : value);
+
+            console.log(frequencyDataArray);
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ frequencyData: frequencyDataArray }));
+            }
+        }
+
+        function keyPressed() {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ key: key }));
+            }
+        }
+
+        function mouseClicked() {
+            if (loaded) {
+                sound.start();
+            }
+        }
+
+        Tone.loaded().then(function () {
+            loaded = true;
+        })
+    </script>
+</body>
+</html> 

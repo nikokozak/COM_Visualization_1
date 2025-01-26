@@ -1,2 +1,3 @@
+ofxCurve
 ofxGui
 ofxOsc

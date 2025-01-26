@@ -14,8 +14,12 @@ void ofApp::setup(){
         float y = 100.0f - (t * 200.0f);
         float z = t * rotationRadius;
         baseLine.addVertex(x, y, z);
+        controlPoints.push_back(glm::vec3(x, y, z));
     }
     
+    // Generated our interpolated points
+    interpolatedPoints = evalCR(controlPoints, interpolationSteps);
+
     // Setup lighting
     light.setPosition(lightPos.x, lightPos.y, lightPos.z);
     light.setDiffuseColor(ofColor(255, 255, 255));
@@ -45,6 +49,8 @@ void ofApp::setup(){
     gui.add(lightPosX.setup("Light Pos X", 300, -1000, 1000));
     gui.add(lightPosY.setup("Light Pos Y", 300, -1000, 1000));
     gui.add(lightPosZ.setup("Light Pos Z", 300, -1000, 1000));
+    gui.add(dbMin.setup("DB Min", -30, -0, -100));
+    gui.add(dbMax.setup("DB Max", -40, -0, -100));
     
     // Update initial values
     rotationRadius = rotationRadiusSlider;
@@ -61,10 +67,47 @@ void ofApp::setup(){
     ofxGuiSetFillColor(ofColor(128, 128, 128));
     ofxGuiSetBackgroundColor(ofColor(0, 0, 0));
     ofxGuiSetBorderColor(ofColor(200, 200, 200));
+
+    // Add near start of setup
+    receiver.setup(PORT);
+    messages.reserve(MAX_MESSAGES);
+
+    // Add to setup
+    fftData.resize(FFT_SIZE, 0.0f);  // Initialize with zeros
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    // Add near start of update
+    while(receiver.hasWaitingMessages()) {
+        ofxOscMessage m;
+        receiver.getNextMessage(m);
+        
+        if(m.getAddress() == "/fft") {
+            // Ensure fftData is the same size as the incoming data
+            int numArgs = m.getNumArgs();
+            if (numArgs != fftData.size()) {
+                fftData.resize(numArgs, 0.0f);
+                // Control points needs to be 3n + 1
+                controlPoints.resize(numArgs, glm::vec3(0.0f, 0.0f, 0.0f));
+            }
+
+            // Update fftData with new values
+            for(int i = 0; i < numArgs; i++) {
+                fftData[i] = m.getArgAsFloat(i);
+                controlPoints[i] = glm::vec3(fftData[i], 0.0f, 0.0f);
+            }
+
+            string msg = m.getAddress();
+            for(int i = 0; i < m.getNumArgs(); i++) {
+                msg += " " + m.getArgAsString(i);
+            }
+            messages.push_back(msg);
+            if(messages.size() > MAX_MESSAGES) {
+                messages.erase(messages.begin());
+            }
+        }
+    }
     float currentTime = ofGetElapsedTimef();
     rotationAngle = (currentTime / totalRotationTime) * 360.0f;
 
@@ -75,26 +118,19 @@ void ofApp::update(){
     lightPos.y = lightPosY;
     lightPos.z = lightPosZ;
 
-/*     // Recalculate the base line
-    for (int i = 0; i < lineSegments; i++) {
-        float t = (float)i / (lineSegments - 1.0f);
-        float timeScale = 0.05;
-        float noiseVal = ofSignedNoise(rotationAngle * t * timeScale);
-        float x = t * rotationRadius;
-        float y = (coneHeight - (t * (coneHeight * 2))) + (noiseVal * 10.0f);
-        float z = t * rotationRadius;
-        baseLine.addVertex(x, y, z);
-    } */
+    interpolatedPoints = evalCR(controlPoints, interpolationSteps);
 
         // Recalculate the base line
-    for (int i = 0; i < lineSegments; i++) {
-        float t = (float)i / (lineSegments - 1.0f);
+    for (int i = 0; i < interpolationSteps; i++) {
+        float t = (float)i / (interpolationSteps - 1.0f);
         float timeScale = 0.05;
-        float noiseVal = ofSignedNoise(rotationAngle * t * timeScale);
+        float noiseVal = ofMap(interpolatedPoints[i].x, dbMin, dbMax, 0, 100, true);
         float x = t * rotationRadius;
-        float y = (coneHeight - (t * (coneHeight * 2))) + (noiseVal * 10.0f);
+        float y = (coneHeight - (t * (coneHeight * 2))) + noiseVal;
         float z = t * rotationRadius;
         baseLine.addVertex(x, y, z);
+        ofLogNotice() << "x: " << x << " y: " << y << " z: " << z;
+        ofLogNotice() << "noiseVal: " << noiseVal;
     }
     
     if (currentTime - lastSnapshotTime >= snapshotInterval) {
@@ -259,18 +295,26 @@ void ofApp::draw(){
     ofDisableAlphaBlending();
     
     ofPopMatrix();
+
+    // Add near end of draw, after cam.end()
+    ofSetColor(255);
+    float y = 20;
+    for(const auto& msg : messages) {
+        ofDrawBitmapString(msg, 20, y);
+        y += 20;
+    }
+
     cam.end();
     light.disable();
 
- 
 
     ofDisableDepthTest();
 
-    // Draw instructions
+/*     // Draw instructions
     ofDrawBitmapString("Press 'l' to toggle light movement mode\n"
                       "When active, use mouse to move light\n"
                       "Press 's' to save light position\n"
-                      "Press 'h' to show/hide GUI", 20, ofGetHeight() - 80);
+                      "Press 'h' to show/hide GUI", 20, ofGetHeight() - 80); */
 }
 
 //--------------------------------------------------------------
