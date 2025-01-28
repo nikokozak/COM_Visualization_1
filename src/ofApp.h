@@ -50,6 +50,7 @@ class ofApp : public ofBaseApp{
 		float coneHeight = 100.0f;
 		int lineSegments = 150;
 		int samples = 35;
+		int distanceFromCenter = 50;
 		
 		ofEasyCam cam;
 
@@ -75,6 +76,9 @@ class ofApp : public ofBaseApp{
 		ofxIntSlider lightPosZ;
 		ofxIntSlider dbMin;
 		ofxIntSlider dbMax;
+		ofxIntSlider distanceFromCenterSlider;
+		ofxIntSlider verticalPointsSlider;  // Number of vertical points to draw
+		vector<ofPolyline> verticalLines;    // Store vertical lines for each base point
 
 		// GUI parameters
 		ofParameter<float> totalRotationTimeParam{"Rotation Time", 10.0f, 1.0f, 30.0f};

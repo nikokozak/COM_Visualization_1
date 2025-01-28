@@ -10,9 +10,9 @@ void ofApp::setup(){
     // Precalculate the base line
     for (int i = 0; i < 40; i++) {
         float t = (float)i / 39.0f;
-        float x = t * rotationRadius;
+        float x = distanceFromCenter + t * rotationRadius;
         float y = 100.0f - (t * 200.0f);
-        float z = t * rotationRadius;
+        float z = distanceFromCenter + t * rotationRadius;
         baseLine.addVertex(x, y, z);
         controlPoints.push_back(glm::vec3(x, y, z));
     }
@@ -40,7 +40,7 @@ void ofApp::setup(){
     gui.setPosition(20, 20);
     gui.setDefaultWidth(300);
     gui.setDefaultHeight(20);
-    gui.add(height.setup("Cone Height", 100, 10, 500));
+    gui.add(height.setup("Cone Height", 0, 0, 500));
     gui.add(segments.setup("Line Segments", 150, 10, 300));
     gui.add(rotationTime.setup("Rotation Time", 10, 1, 30));
     gui.add(snapshotIntervalSlider.setup("Snapshot Interval", 0.05, 0.01, 0.5));
@@ -53,6 +53,8 @@ void ofApp::setup(){
     gui.add(dbMax.setup("DB Max", -40, -0, -100));
     gui.add(drawMeshToggle.setup("Draw Mesh", true));
     gui.add(pointSize.setup("Point Size", 2, 1, 10));
+    gui.add(distanceFromCenterSlider.setup("Distance From Center", 50, 10, 200));
+    gui.add(verticalPointsSlider.setup("Vertical Points", 5, 1, 20));
     
     // Update initial values
     rotationRadius = rotationRadiusSlider;
@@ -61,6 +63,7 @@ void ofApp::setup(){
     totalRotationTime = rotationTime;
     snapshotInterval = snapshotIntervalSlider;
     samples = sampleSlider;
+    distanceFromCenter = distanceFromCenterSlider;
     
     ofxGuiSetFont("DIN Alternate Bold", 10);
     ofxGuiSetDefaultWidth(300);
@@ -114,6 +117,7 @@ void ofApp::update(){
     rotationAngle = (currentTime / totalRotationTime) * 360.0f;
 
     baseLine.clear();
+    verticalLines.clear();  // Clear previous vertical lines
 
     light.setPosition(lightPosX, lightPosY, lightPosZ);
     lightPos.x = lightPosX;
@@ -122,17 +126,28 @@ void ofApp::update(){
 
     interpolatedPoints = evalCR(controlPoints, interpolationSteps);
 
-        // Recalculate the base line
+    // Recalculate the base line and vertical lines
     for (int i = 0; i < interpolationSteps; i++) {
         float t = (float)i / (interpolationSteps - 1.0f);
         float timeScale = 0.05;
         float noiseVal = ofMap(interpolatedPoints[i].x, dbMax, dbMin, -40, 40, true);
-        float x = t * rotationRadius;
+        float x = distanceFromCenter + t * rotationRadius;
         float y = (coneHeight - (t * (coneHeight * 2))) + noiseVal;
-        float z = t * rotationRadius;
+        float z = distanceFromCenter + t * rotationRadius;
         baseLine.addVertex(x, y, z);
-        ofLogNotice() << "x: " << x << " y: " << y << " z: " << z;
-        ofLogNotice() << "noiseVal: " << noiseVal;
+
+        // Create vertical line for this base point
+        ofPolyline verticalLine;
+        verticalLine.addVertex(x, y, z);  // Start at base point
+        
+        // Add vertical points
+        int numVerticalPoints = verticalPointsSlider;
+        float verticalSpacing = 50.0f;  // Adjust this value to change spacing between points
+        for(int j = 1; j <= numVerticalPoints; j++) {
+            verticalLine.addVertex(x, y + (j * verticalSpacing), z);
+        }
+        
+        verticalLines.push_back(verticalLine);
     }
     
     if (currentTime - lastSnapshotTime >= snapshotInterval) {
@@ -146,6 +161,7 @@ void ofApp::update(){
     lineSegments = segments;
     totalRotationTime = rotationTime;
     snapshotInterval = snapshotIntervalSlider;
+    distanceFromCenter = distanceFromCenterSlider;
 }
 
 void ofApp::takeSnapshot() {
