@@ -8,12 +8,23 @@
 </head>
 <body>
     <script>
-        const sound = new SimplePlayer("samples/pad.wav");
-        sound.toDestination();
+        const sound_a = new SimplePlayer("samples/pad.wav");
+        const sound_b = new SimplePlayer("samples/Pad-Druidmist.wav");
+        const sound_c = new SimplePlayer("samples/Perc-Electrotom.wav");
+        const sound_d = new SimplePlayer("samples/Snare-Fsnappish.wav");
+        const sound_e = new SimplePlayer("samples/Synth-PutAMeepelOnIt.wav");
+        sound_a.toDestination();
+        sound_b.toDestination();
+        sound_c.toDestination();
+        sound_d.toDestination();
+        sound_e.toDestination();
         let analyzerSize = 64;
         let analyzer = new Tone.FFT(analyzerSize);
-        sound.connect(analyzer);
-
+        sound_a.connect(analyzer);
+        sound_b.connect(analyzer);
+        sound_c.connect(analyzer);
+        sound_d.connect(analyzer);
+        sound_e.connect(analyzer);
         let loaded = false;
         let ws;
 
@@ -43,14 +54,38 @@
 
         function keyPressed() {
             if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ key: key }));
+                if (loaded) {
+                    console.log('Key pressed:', key); // Debug log
+                    switch (key.toLowerCase()) { // Make case-insensitive
+                        case 'a':
+                            console.log('Playing sound A');
+                            sound_a.start();
+                            break;
+                        case 's':
+                            console.log('Playing sound B'); 
+                            sound_b.start();
+                            break;
+                        case 'd':
+                            console.log('Playing sound C');
+                            sound_c.start();
+                            break;
+                        case 'f':
+                            console.log('Playing sound D');
+                            sound_d.start();
+                            break;
+                        case 'g':
+                            console.log('Playing sound E');
+                            sound_e.start();
+                            break;
+                    }
+                }
             }
         }
 
         function mouseClicked() {
-            if (loaded) {
+        /*     if (loaded) {
                 sound.start();
-            }
+            } */
         }
 
         Tone.loaded().then(function () {

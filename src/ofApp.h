@@ -79,6 +79,10 @@ class ofApp : public ofBaseApp{
 		ofxIntSlider distanceFromCenterSlider;
 		ofxIntSlider verticalPointsSlider;  // Number of vertical points to draw
 		vector<ofPolyline> verticalLines;    // Store vertical lines for each base point
+		ofxFloatSlider hueMin;  // Minimum hue value
+		ofxFloatSlider hueMax;  // Maximum hue value
+		ofxFloatSlider heightMin;  // Minimum height for mapping
+		ofxFloatSlider heightMax;  // Maximum height for mapping
 
 		// GUI parameters
 		ofParameter<float> totalRotationTimeParam{"Rotation Time", 10.0f, 1.0f, 30.0f};

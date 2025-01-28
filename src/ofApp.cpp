@@ -55,6 +55,10 @@ void ofApp::setup(){
     gui.add(pointSize.setup("Point Size", 2, 1, 10));
     gui.add(distanceFromCenterSlider.setup("Distance From Center", 50, 10, 200));
     gui.add(verticalPointsSlider.setup("Vertical Points", 5, 1, 20));
+    gui.add(hueMin.setup("Hue Min", 0, 0, 255));
+    gui.add(hueMax.setup("Hue Max", 255, 0, 255));
+    gui.add(heightMin.setup("Height Min", -200, -500, 0));
+    gui.add(heightMax.setup("Height Max", 200, 0, 500));
     
     // Update initial values
     rotationRadius = rotationRadiusSlider;
@@ -162,6 +166,7 @@ void ofApp::update(){
     totalRotationTime = rotationTime;
     snapshotInterval = snapshotIntervalSlider;
     distanceFromCenter = distanceFromCenterSlider;
+    samples = sampleSlider;
 }
 
 void ofApp::takeSnapshot() {
@@ -260,21 +265,12 @@ void ofApp::takeSnapshot() {
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofEnableLighting();
-    light.enable();
 
     // Draw Helpers
     if (showGui) {
         ofSetColor(255);  // Reset color to white before drawing GUI
         gui.draw();
         ofDisableLighting();
-        ofSetColor(255, 255, 0);  // Yellow for light visualization
-        ofDrawSphere(lightPos, 10);  // Light position indicator
-        // Optional: draw axes at light position
-        ofPushMatrix();
-        ofTranslate(lightPos);
-        ofDrawAxis(50);
-        ofPopMatrix();
-        ofEnableLighting();
     }
         
     cam.begin();
@@ -282,7 +278,11 @@ void ofApp::draw(){
     ofEnableAlphaBlending();
     ofEnableDepthTest();
 
-    // Begin pushMatrix to make everythiing stationary
+    // Set up light before rotation
+    light.enable();
+    light.setPosition(0, 0, 500);  // Center light above scene
+    
+    // Begin pushMatrix to make everything stationary
     ofPushMatrix();
     ofRotateDeg(-rotationAngle, 0,1,0);
     
@@ -302,9 +302,12 @@ void ofApp::draw(){
             // Draw trail through time for this vertex position
             glBegin(GL_LINE_STRIP);
             for(size_t snapIndex = 0; snapIndex < lineSnapshots.size(); snapIndex++) {
-                float alpha = ofMap(snapIndex, 0, lineSnapshots.size(), 50, 255);
-                ofSetColor(255, 255, 255, alpha);
                 auto& vert = lineSnapshots[snapIndex].getVertices()[vertIndex];
+                // Map height to hue
+                float hue = ofMap(vert.y, heightMin, heightMax, hueMin, hueMax, true);
+                ofColor col;
+                col.setHsb(hue, 200, 255, 255);
+                ofSetColor(col);
                 glVertex3f(vert.x, vert.y, vert.z);
             }
             glEnd();
@@ -313,6 +316,11 @@ void ofApp::draw(){
             glBegin(GL_POINTS);
             for(const auto& snapshot : lineSnapshots) {
                 auto& vert = snapshot.getVertices()[vertIndex];
+                // Map height to hue for points
+                float hue = ofMap(vert.y, heightMin, heightMax, hueMin, hueMax, true);
+                ofColor col;
+                col.setHsb(hue, 200, 255, 255);
+                ofSetColor(col);
                 glVertex3f(vert.x, vert.y, vert.z);
             }
             glEnd();
@@ -323,13 +331,6 @@ void ofApp::draw(){
     // Disable lighting for lines
     ofDisableLighting();
     
-    // Draw snapshots (optional now - you might want to remove these)
-    // for (size_t i = 0; i < lineSnapshots.size(); ++i) {
-    //     float alpha = ofMap(i, 0, lineSnapshots.size(), 50, 200);
-    //     ofSetColor(255, 255, 255, alpha);
-    //     lineSnapshots[i].draw();
-    // }
-    
     // Current line
     ofPushMatrix();
     ofRotateDeg(rotationAngle, 0, 1, 0);
@@ -339,8 +340,9 @@ void ofApp::draw(){
     ofPopMatrix();
 
     ofDisableAlphaBlending();
-    
     ofPopMatrix();
+
+    light.disable();
 
     // Add near end of draw, after cam.end()
     ofSetColor(255);
@@ -351,9 +353,6 @@ void ofApp::draw(){
     }
 
     cam.end();
-    light.disable();
-
-
     ofDisableDepthTest();
 
 /*     // Draw instructions
